@@ -1,0 +1,182 @@
+object frmMain: TfrmMain
+  Left = 508
+  Height = 271
+  Top = 183
+  Width = 485
+  Caption = 'Make scm file from Firebird'
+  ClientHeight = 271
+  ClientWidth = 485
+  Font.CharSet = ANSI_CHARSET
+  Font.Height = -13
+  Font.Name = 'Arial'
+  Font.Pitch = fpVariable
+  Font.Quality = fqDraft
+  Position = poScreenCenter
+  LCLVersion = '1.4.2.0'
+  object outputFile: TFileNameEdit
+    Left = 15
+    Height = 24
+    Top = 24
+    Width = 454
+    DialogTitle = 'Database metadata'
+    Filter = 'Files scm (*.scm)|*.scm|All files (*.*)|*.*'
+    FilterIndex = 0
+    DefaultExt = 'scm'
+    HideDirectories = False
+    ButtonWidth = 23
+    NumGlyphs = 1
+    Anchors = [akTop, akLeft, akRight]
+    MaxLength = 0
+    TabOrder = 0
+  end
+  object Label1: TLabel
+    Left = 16
+    Height = 16
+    Top = 8
+    Width = 59
+    Caption = 'Output file'
+    ParentColor = False
+  end
+  object GroupBox1: TGroupBox
+    Left = 16
+    Height = 128
+    Top = 64
+    Width = 453
+    Anchors = [akTop, akLeft, akRight]
+    Caption = 'Database connection'
+    ClientHeight = 107
+    ClientWidth = 449
+    TabOrder = 1
+    object dbFile: TFileNameEdit
+      Left = 8
+      Height = 24
+      Top = 24
+      Width = 432
+      Filter = 'Firebase files (*.fdb)|*.fdb|Interbase files (*.gdb)|*.gdb|All files (*.*)|*.*'
+      FilterIndex = 0
+      HideDirectories = False
+      ButtonWidth = 23
+      NumGlyphs = 1
+      MaxLength = 0
+      TabOrder = 0
+    end
+    object Label2: TLabel
+      Left = 8
+      Height = 16
+      Top = 6
+      Width = 75
+      Caption = 'Database file'
+      ParentColor = False
+    end
+    object edUser: TEdit
+      Left = 8
+      Height = 24
+      Top = 72
+      Width = 120
+      TabOrder = 1
+      Text = 'SYSDBA'
+    end
+    object edPassword: TEdit
+      Left = 170
+      Height = 24
+      Top = 72
+      Width = 120
+      EchoMode = emPassword
+      PasswordChar = '*'
+      TabOrder = 2
+      Text = 'masterkey'
+    end
+    object Label3: TLabel
+      Left = 8
+      Height = 16
+      Top = 55
+      Width = 27
+      Caption = 'User'
+      ParentColor = False
+    end
+    object Label4: TLabel
+      Left = 170
+      Height = 16
+      Top = 55
+      Width = 57
+      Caption = 'Password'
+      ParentColor = False
+    end
+    object edHost: TEdit
+      Left = 320
+      Height = 24
+      Top = 72
+      Width = 120
+      TabOrder = 3
+    end
+    object Label5: TLabel
+      Left = 320
+      Height = 16
+      Top = 55
+      Width = 27
+      Caption = 'Host'
+      ParentColor = False
+    end
+  end
+  object Panel1: TPanel
+    Left = 0
+    Height = 50
+    Top = 221
+    Width = 485
+    Align = alBottom
+    ClientHeight = 50
+    ClientWidth = 485
+    TabOrder = 2
+    object btnExit: TBitBtn
+      Left = 17
+      Height = 35
+      Top = 5
+      Width = 112
+      Caption = 'Exit'
+      OnClick = btnExitClick
+      TabOrder = 0
+    end
+    object btnRun: TBitBtn
+      Left = 344
+      Height = 35
+      Top = 5
+      Width = 112
+      Caption = 'Run'
+      OnClick = btnRunClick
+      TabOrder = 1
+    end
+  end
+  object PB: TProgressBar
+    Left = 0
+    Height = 20
+    Top = 201
+    Width = 485
+    Align = alBottom
+    Smooth = True
+    Step = 1
+    TabOrder = 3
+  end
+  object IBConn: TIBConnection
+    Connected = False
+    LoginPrompt = False
+    KeepConnection = False
+    Transaction = SQLTrans
+    LogEvents = []
+    left = 176
+    top = 64
+  end
+  object SQLTrans: TSQLTransaction
+    Active = False
+    Database = IBConn
+    left = 232
+    top = 64
+  end
+  object qSQL: TSQLQuery
+    FieldDefs = <>
+    Database = IBConn
+    Transaction = SQLTrans
+    Params = <>
+    left = 280
+    top = 64
+  end
+end

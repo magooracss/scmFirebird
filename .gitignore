@@ -1,0 +1,7 @@
+**/exe
+**/doc
+**/src/backup
+*.*~*
+*.*#*
+*.exe
+*.swp
