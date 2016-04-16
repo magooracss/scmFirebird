@@ -1,18 +1,25 @@
-unit frmMain;
+unit frm_main;
 
 {$mode objfpc}{$H+}
 
 interface
 
 uses
-  Classes, SysUtils, IBConnection, sqldb, FileUtil, Forms, Controls, Graphics,
-  Dialogs, EditBtn, StdCtrls, ExtCtrls, ComCtrls, Buttons;
+  Classes, SysUtils, IBConnection, sqldb, db, FileUtil, Forms, Controls,
+  Graphics, Dialogs, EditBtn, StdCtrls, ExtCtrls, ComCtrls, Buttons;
 
 const
   _LogFile = 'scmFirebird.log';
+  _FieldSeparator = ';';
 
   MSG_NO_EXIT_FILE = 'Exit filename empty';
   MSG_NO_DATA = 'Query retrieve 0 records';
+
+(*
+ Object Type managed:
+       - TABLE
+*)
+
 
 type
 
@@ -37,18 +44,26 @@ type
     outputFile: TFileNameEdit;
     IBConn: TIBConnection;
     qSQL: TSQLQuery;
+    qSQLFIELD_LENGTH: TSmallintField;
+    qSQLFIELD_NAME: TStringField;
+    qSQLFIELD_PRECISION: TSmallintField;
+    qSQLFIELD_TYPE: TStringField;
+    qSQLOBJECT_NAME: TStringField;
+    qSQLOBJECT_TYPE: TStringField;
     SQLTrans: TSQLTransaction;
     edHost: TEdit;
     procedure btnExitClick(Sender: TObject);
     procedure btnRunClick(Sender: TObject);
   private
     logFile: TextFile;
+    outFile: TextFile;
     function ConnectDB (fileDB, userDB, passDB, hostDB: string): boolean;
 
     procedure LogStr (fmsg: FormatMSG; msg: string);
 
     procedure ProcessQuery (oFile: string);
-    function ProcessRow (aRow: string): string;
+    function ProcessRow (objType, objName, fieldName, fieldType: string;
+                         fieldlength, fieldpresicion:integer): string;
 
   public
     { public declarations }
@@ -118,36 +133,69 @@ begin
   AssignFile(logFile, ExtractFilePath(Application.ExeName)+ _LOGFILE);
   Append(logFile);
   case fmsg of
-   ERROR: WriteLn(logFile, DateToStr(Now) + ' +++ ERROR +++ ' + + msg);
+   ERROR: WriteLn(logFile, DateToStr(Now) + ' +++ ERROR +++ ' + msg);
    DATA: WriteLn(logFile,  DateToStr(Now) + ' - ' + msg);
   end;
   CloseFile(logFile);
 end;
 
 procedure TfrmMain.ProcessQuery(oFile: string);
+var
+ tmplength, tmpPrecision: integer; //Quick (and bad) check for nulls
 begin
   try
+    AssignFile(outFile, oFile);
+    Rewrite(outFile);
     with qSQL do
     begin
       First;
       Pb.Max:= qSQL.RecordCount; //Set the progress bar
       While not EOF do
       begin
-        ProcessRow('---');
+        if (qSQLFIELD_LENGTH.IsNull) then
+          tmplength:= 0
+        else
+          tmplength:= qSQLFIELD_LENGTH.AsInteger;
+
+        if (qSQLFIELD_PRECISION.IsNull) then
+          tmpPrecision:= 0
+        else
+          tmpPrecision:= qSQLFIELD_PRECISION.AsInteger;
+
+        WriteLn(outFile
+               ,ProcessRow(qSQLOBJECT_TYPE.AsString
+                  ,qSQLOBJECT_NAME.AsString
+                  ,qSQLFIELD_NAME.AsString
+                  ,qSQLFIELD_TYPE.AsString
+                  ,tmplength
+                  ,tmpPrecision
+                  )
+                );
         Next;
         Pb.StepIt;
       end;
     end;
+    CloseFile(outFile);
   except
     on E: Exception do ( LogStr(ERROR, E.Message) );
   end;
 end;
 
-
-//TODO: aRow:string is wrong. This params will be the field of the query
-function TfrmMain.ProcessRow(aRow: string): string;
+function TfrmMain.ProcessRow(objType, objName, fieldName, fieldType: string;
+  fieldlength, fieldpresicion: integer): string;
 begin
-  //
+  Result:=  UpperCase(TRIM(objType))
+           + _FieldSeparator
+           + UpperCase(TRIM(objName))
+           + _FieldSeparator
+           + UpperCase(TRIM(fieldName))
+           + _FieldSeparator
+           + UpperCase(TRIM(fieldType))
+           + _FieldSeparator
+           + IntToStr(fieldlength)
+           + _FieldSeparator
+           + IntToStr(fieldpresicion)
+           ;
 end;
 
 end.

@@ -160,7 +160,9 @@ object frmMain: TfrmMain
     Connected = False
     LoginPrompt = False
     KeepConnection = False
+    Password = 'masterkey'
     Transaction = SQLTrans
+    UserName = 'sysdba'
     LogEvents = []
     left = 176
     top = 64
@@ -172,11 +174,144 @@ object frmMain: TfrmMain
     top = 64
   end
   object qSQL: TSQLQuery
-    FieldDefs = <>
+    IndexName = 'DEFAULT_ORDER'
+    FieldDefs = <    
+      item
+        Name = 'OBJECT_TYPE'
+        DataType = ftFixedChar
+        Precision = -1
+        Size = 1
+      end    
+      item
+        Name = 'OBJECT_NAME'
+        DataType = ftFixedChar
+        Precision = -1
+        Size = 93
+      end    
+      item
+        Name = 'FIELD_NAME'
+        DataType = ftFixedChar
+        Precision = -1
+        Size = 93
+      end    
+      item
+        Name = 'FIELD_LENGTH'
+        DataType = ftSmallint
+        Precision = -1
+        Size = 0
+      end    
+      item
+        Name = 'FIELD_PRECISION'
+        DataType = ftSmallint
+        Precision = -1
+        Size = 0
+      end    
+      item
+        Name = 'FIELD_TYPE'
+        DataType = ftFixedChar
+        Precision = -1
+        Size = 93
+      end>
     Database = IBConn
     Transaction = SQLTrans
+    SQL.Strings = (
+      'SELECT'
+      '        ''T'' as object_type'
+      '        ,r.RDB$RELATION_NAME as object_name'
+      '        ,r.RDB$FIELD_NAME AS field_name'
+      '        ,f.RDB$FIELD_LENGTH AS field_length'
+      '        ,f.RDB$FIELD_PRECISION AS field_precision'
+      '        ,CASE f.RDB$FIELD_TYPE'
+      '          WHEN 7 THEN ''SMALLINT'''
+      '          WHEN 8 THEN ''INTEGER'''
+      '          WHEN 9 THEN ''QUAD'''
+      '          WHEN 10 THEN ''FLOAT'''
+      '          WHEN 11 THEN ''D_FLOAT'''
+      '          WHEN 12 THEN ''DATE'''
+      '          WHEN 13 THEN ''TIME'''
+      '          WHEN 14 THEN ''CHAR'''
+      '          WHEN 16 THEN ''INT64'''
+      '          WHEN 27 THEN ''DOUBLE'''
+      '          WHEN 35 THEN ''TIMESTAMP'''
+      '          WHEN 37 THEN ''VARCHAR'''
+      '          WHEN 40 THEN ''CSTRING'''
+      '          WHEN 261 THEN ''BLOB'''
+      '          ELSE f.RDB$FIELD_NAME'
+      '        END AS field_type'
+      'FROM RDB$RELATION_FIELDS r'
+      '   LEFT JOIN RDB$FIELDS f ON r.RDB$FIELD_SOURCE = f.RDB$FIELD_NAME'
+      'ORDER BY r.RDB$RELATION_NAME, r.RDB$FIELD_NAME'
+      ''
+    )
+    InsertSQL.Strings = (
+      ''
+    )
     Params = <>
     left = 280
     top = 64
+    object qSQLOBJECT_TYPE: TStringField
+      DisplayWidth = 1
+      FieldKind = fkData
+      FieldName = 'OBJECT_TYPE'
+      Index = 0
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = True
+      Size = 1
+    end
+    object qSQLOBJECT_NAME: TStringField
+      DisplayWidth = 93
+      FieldKind = fkData
+      FieldName = 'OBJECT_NAME'
+      Index = 1
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = False
+      Size = 93
+    end
+    object qSQLFIELD_NAME: TStringField
+      DisplayWidth = 93
+      FieldKind = fkData
+      FieldName = 'FIELD_NAME'
+      Index = 2
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = False
+      Size = 93
+    end
+    object qSQLFIELD_LENGTH: TSmallintField
+      DisplayWidth = 10
+      FieldKind = fkData
+      FieldName = 'FIELD_LENGTH'
+      Index = 3
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = False
+    end
+    object qSQLFIELD_PRECISION: TSmallintField
+      DisplayWidth = 10
+      FieldKind = fkData
+      FieldName = 'FIELD_PRECISION'
+      Index = 4
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = False
+    end
+    object qSQLFIELD_TYPE: TStringField
+      DisplayWidth = 93
+      FieldKind = fkData
+      FieldName = 'FIELD_TYPE'
+      Index = 5
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = False
+      Size = 93
+    end
   end
 end
