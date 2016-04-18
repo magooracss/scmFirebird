@@ -174,7 +174,6 @@ object frmMain: TfrmMain
     top = 64
   end
   object qSQL: TSQLQuery
-    IndexName = 'DEFAULT_ORDER'
     FieldDefs = <    
       item
         Name = 'OBJECT_TYPE'

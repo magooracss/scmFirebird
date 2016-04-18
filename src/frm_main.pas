@@ -142,6 +142,7 @@ end;
 procedure TfrmMain.ProcessQuery(oFile: string);
 var
  tmplength, tmpPrecision: integer; //Quick (and bad) check for nulls
+ retRow: string;
 begin
   try
     AssignFile(outFile, oFile);
@@ -162,15 +163,17 @@ begin
         else
           tmpPrecision:= qSQLFIELD_PRECISION.AsInteger;
 
-        WriteLn(outFile
-               ,ProcessRow(qSQLOBJECT_TYPE.AsString
+        retRow:= ProcessRow(qSQLOBJECT_TYPE.AsString
                   ,qSQLOBJECT_NAME.AsString
                   ,qSQLFIELD_NAME.AsString
                   ,qSQLFIELD_TYPE.AsString
                   ,tmplength
                   ,tmpPrecision
-                  )
-                );
+                  );
+
+        if (retRow <> EmptyStr) then
+          WriteLn(outFile, retRow);
+
         Next;
         Pb.StepIt;
       end;
@@ -183,8 +186,22 @@ end;
 
 function TfrmMain.ProcessRow(objType, objName, fieldName, fieldType: string;
   fieldlength, fieldpresicion: integer): string;
+const
+  _MONTB = 'MON$'; //System Monitor tables
+  _SYSTB = 'RDB$'; //System tables
+var
+ tempStr: string;
+ isSysRow: boolean;
 begin
-  Result:=  UpperCase(TRIM(objType))
+
+  // Check for system tables. If I find one, return EmptyStr;
+  tempStr:= Copy(UpperCase(Trim(objName)),1, 4);
+
+  isSysRow := ((tempStr = _MONTB) or (tempStr = _SYSTB));
+
+
+  if (not isSysRow) then
+    Result:=  UpperCase(TRIM(objType))
            + _FieldSeparator
            + UpperCase(TRIM(objName))
            + _FieldSeparator
@@ -195,7 +212,8 @@ begin
            + IntToStr(fieldlength)
            + _FieldSeparator
            + IntToStr(fieldpresicion)
-           ;
+    else
+      Result:= EmptyStr;
 end;
 
 end.
